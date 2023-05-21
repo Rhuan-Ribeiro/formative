@@ -1,0 +1,8 @@
+# Crie uma consulta para mostrar qual a média por municipio da nota idesp_ef_iniciais, nota_idesp_ef_finais e nota_idesp_em; 
+select id_municipio as MUNICIPIO, avg(nota_idesp_ef_iniciais) as MEDIA_NOTAS_INICIAIS, avg(nota_idesp_ef_finais) as MEDIA_NOTAS_FINAIS, avg(nota_idesp_em) as MEDIA_NOTAS_EM from escola group by id_municipio;
+
+# Crie uma consulta para mostrar qual a média por municipio e por ano da nota idesp_ef_iniciais, nota_idesp_ef_finais e nota_idesp_em; 
+select ano, id_municipio as MUNICIPIO, avg(nota_idesp_ef_iniciais) as MEDIA_NOTAS_INICIAIS, avg(nota_idesp_ef_finais) as MEDIA_NOTAS_FINAIS, avg(nota_idesp_em) as MEDIA_NOTAS_EM from escola group by id_municipio, ano;
+
+# Crie uma consulta para mostrar qual a média da composição conjunta por municipio da nota idesp_ef_iniciais, nota_idesp_ef_finais e nota_idesp_em; 
+select id_municipio as MUNICIPIO, avg(nota_idesp_ef_iniciais+nota_idesp_ef_finais+nota_idesp_em) as MEDIA_CONJUNTA from escola group by id_municipio;
