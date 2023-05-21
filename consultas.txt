@@ -1,0 +1,36 @@
+# Crie uma consulta que mostre todos os locais que já tiveram ao menos um evento;
+select l.name as EVENTO from locals l join events e on l.id = e.local_fk where(time_end < now())  group by l.name; 
+
+# Crie uma consulta que mostre todos os locais que não tiveram associação a nenhum evento;
+select l.name as EVENTO from locals l where l.id not in (select l.id from events e join locals l on e.local_fk = l.id) order by l.name asc;
+
+# Crie uma consulta que mostre todos eventos filtrando por uma data inicial e data final (esse tipo de consulta será usada quando o usuário buscar os eventos por data);
+select e.name as EVENTO, e.time_init as INICIO, e.time_end as FIM, e.checkin_limit as CHECKIN_LIMITE from events e where (time_init > '2023-05-20' and time_init < '2023-06-20') order by e.name asc;
+
+# Crie uma consulta que mostre todos os usuários que já participaram de ao menos um evento;
+select u.name from users u join checkins c on u.id = c.user_fk group by u.name having count(u.id) >= 1 order by u.name asc; 
+
+# Crie uma consulta que mostre todos os eventos ainda não iniciados com a relação de seus usuários que já fizeram check-in;
+select e.name as EVENTO, e.time_init as INICIO from checkins c join events e on c.event_fk = e.id join users u on c.user_fk = u.id group by e.name, e.time_init order by e.name asc; #5
+
+# Crie uma consulta que mostre todos os usuários e a quantidade de vezes que o mesmo já se registrou em algum evento;
+select u.name as USUARIO , count(u.id) as N_CHECKINS from users u join checkins c on c.user_fk = u.id group by u.name order by u.name; 
+
+# Crie uma consulta que mostre o evento com maior número de check-in e o com o menor;
+select e.name as EVENTO, count(e.name) as CHECKINS from events e join checkins c on e.id = c.event_fk group by e.name having count(c.event_fk) = (select max(tot_checkins) from (select count(event_fk) as tot_checkins from checkins group by event_fk) as subquery);
+select e.name as EVENTO, count(e.name) as CHECKINS from events e join checkins c on e.id = c.event_fk group by e.name having count(c.event_fk) = (select min(tot_checkins) from (select count(event_fk) as tot_checkins from checkins group by event_fk) as subquery);
+
+# Crie uma consulta que mostre a média de participantes por local;
+select l.name as LOCAL, avg(e.n_particips) as MEDIA_PARTICIPANTES from events e join locals l on e.local_fk = l.id group by l.name order by l.name asc; 
+
+# Crie uma consulta que mostre todos os usuários e seu perfil de nível de acesso; 
+select u.name as USUARIO, a.level_access as NIVEL_ACESSO, a.name as ACESSO_TIPO, o.name as OCUPAÇÂO from users u join occupations o on u.occupation_fk = o.id join accesses a on o.access_fk = a.id order by u.name;
+
+# Crie uma consulta que mostre todos os eventos que tenham vagas disponíveis e cujo período de liberação de check-in está aberto;
+select e.name as EVENTO, e.n_particips as MAX_PARTICIPANTES, checkin_limit as CHECKIN_ABERTO_ATÉ from events e where (checkin_limit > now()) group by e.name, e.n_particips, e.checkin_limit having (e.n_particips > (select count(c.user_fk) from checkins c join events e on c.event_fk = e.id)); 
+
+# Crie uma consulta que mostre todos os eventos que já alcançaram o seu número máximo de participantes (esgotaram) mas que ainda não aconteceram; 
+select e.name as EVENTO, e.n_particips as MAX_PARTICIPANTES, time_init as INICIO from events e where (checkin_limit > now()) group by e.name, e.n_particips, e.time_init having (e.n_particips <= (select count(c.user_fk) from checkins c join events e on c.event_fk = e.id)); 
+
+#Crie uma consulta que mostre todos os usuários que foram cadastrados em um determinado período mas que contenham ao mínimo dois check-ins;
+select u.name as USUARIOS,count(*) as CHECKINS from users u join checkins c on u.id = c.user_fk where u.dtRgt between '2023-05-19' and '2023-05-22' group by u.id having count(*)>=2;
